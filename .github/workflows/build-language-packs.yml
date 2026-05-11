@@ -1,0 +1,146 @@
+name: Build Language Packs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build ZIPs
+        run: python build_language_packs.py
+
+      - name: Delete existing latest release
+        run: gh release delete latest --yes --cleanup-tag || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create latest release
+        run: |
+          gh release create latest \
+            --title "CRE8 Members Language Packs (latest)" \
+            --notes "Automatically built from the latest translations on \`main\`.
+
+          **Install:** Download the ZIP for your language and install via *Joomla → System → Install → Extensions*." \
+            dist/*.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate downloads-members.xml
+        run: |
+          python3 << 'PYEOF'
+          import re, subprocess
+          from pathlib import Path
+          from datetime import datetime, timezone
+
+          lang_names = {
+              "af-ZA": "Afrikaans",               "am-ET": "Amharic",
+              "ar-SA": "Arabic",                  "az-AZ": "Azerbaijani",
+              "be-BY": "Belarusian",              "bg-BG": "Bulgarian",
+              "bn-BD": "Bengali",                 "bs-BA": "Bosnian",
+              "ca-ES": "Catalan",                 "cs-CZ": "Czech",
+              "da-DK": "Danish",                  "de-AT": "German (Austria)",
+              "de-CH": "German (Switzerland)",    "de-DE": "German",
+              "el-GR": "Greek",                   "es-AR": "Spanish (Argentina)",
+              "es-BO": "Spanish (Bolivia)",       "es-CL": "Spanish (Chile)",
+              "es-CO": "Spanish (Colombia)",      "es-CR": "Spanish (Costa Rica)",
+              "es-EC": "Spanish (Ecuador)",       "es-ES": "Spanish",
+              "es-MX": "Spanish (Mexico)",        "es-NI": "Spanish (Nicaragua)",
+              "es-PE": "Spanish (Peru)",          "es-SV": "Spanish (El Salvador)",
+              "es-US": "Spanish (US)",            "es-VE": "Spanish (Venezuela)",
+              "et-EE": "Estonian",                "eu-ES": "Basque",
+              "fa-IR": "Persian",                 "fi-FI": "Finnish",
+              "fr-BE": "French (Belgium)",        "fr-CA": "French (Canada)",
+              "fr-CH": "French (Switzerland)",    "fr-FR": "French",
+              "gl-ES": "Galician",                "gu-IN": "Gujarati",
+              "he-IL": "Hebrew",                  "hi-IN": "Hindi",
+              "hr-HR": "Croatian",                "hu-HU": "Hungarian",
+              "hy-AM": "Armenian",                "id-ID": "Indonesian",
+              "is-IS": "Icelandic",               "it-IT": "Italian",
+              "ja-JP": "Japanese",                "ka-GE": "Georgian",
+              "kk-KZ": "Kazakh",                  "km-KH": "Khmer",
+              "ko-KR": "Korean",                  "lt-LT": "Lithuanian",
+              "lv-LV": "Latvian",                 "mk-MK": "Macedonian",
+              "mn-MN": "Mongolian",               "mr-IN": "Marathi",
+              "ms-MY": "Malay",                   "nb-NO": "Norwegian",
+              "nl-BE": "Dutch (Belgium)",         "nl-NL": "Dutch",
+              "pl-PL": "Polish",                  "pt-BR": "Portuguese (Brazil)",
+              "pt-PT": "Portuguese",              "ro-RO": "Romanian",
+              "ru-RU": "Russian",                 "sk-SK": "Slovak",
+              "sl-SI": "Slovenian",               "sq-AL": "Albanian",
+              "sr-RS": "Serbian",                 "sv-SE": "Swedish",
+              "sw-KE": "Swahili",                 "ta-IN": "Tamil",
+              "te-IN": "Telugu",                  "th-TH": "Thai",
+              "tr-TR": "Turkish",                 "uk-UA": "Ukrainian",
+              "ur-PK": "Urdu",                    "vi-VN": "Vietnamese",
+              "zh-CN": "Chinese (Simplified)",    "zh-HK": "Chinese (Hong Kong)",
+              "zh-TW": "Chinese (Traditional)",
+          }
+
+          base_url = "https://github.com/translation-creative-graphics/payplans/releases/download/latest"
+
+          items = []
+          for zip_file in Path("dist").glob("com_payplans_*.zip"):
+              match = re.search(r"com_payplans_([a-z]{2}-[A-Z]{2})\.zip", zip_file.name)
+              if not match:
+                  continue
+              code = match.group(1)
+              name = lang_names.get(code, code)
+              size = zip_file.stat().st_size
+              download = f"{base_url}/{zip_file.name}"
+
+              result = subprocess.run(
+                  ["git", "log", "-1", "--format=%cI", "--",
+                   f"language/{code}/", f"administrator/language/{code}/"],
+                  capture_output=True, text=True
+              )
+              raw = result.stdout.strip()
+              if raw:
+                  updated = datetime.fromisoformat(raw).astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+              else:
+                  updated = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+
+              items.append({"code": code, "name": name, "download": download, "size": size, "updated": updated})
+
+          items.sort(key=lambda x: x["name"].lower())
+
+          lines = ['<?xml version="1.0" encoding="UTF-8"?>', "<languages>"]
+          for item in items:
+              lines += [
+                  "  <language>",
+                  f"    <code>{item['code']}</code>",
+                  f"    <name>{item['name']}</name>",
+                  f"    <download>{item['download']}</download>",
+                  f"    <size>{item['size']}</size>",
+                  f"    <updated>{item['updated']}</updated>",
+                  "  </language>",
+              ]
+          lines.append("</languages>")
+
+          Path("downloads-members.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          print(f"Generated downloads-members.xml with {len(items)} languages")
+          PYEOF
+
+      - name: Commit downloads-members.xml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add downloads-members.xml
+          git diff --staged --quiet || git commit -m "chore: update downloads-members.xml [skip ci]"
+          git push
