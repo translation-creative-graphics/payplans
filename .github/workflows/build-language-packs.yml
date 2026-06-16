@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      WEBLATE_TOKEN: ${{ secrets.WEBLATE_TOKEN }}
 
     steps:
       - name: Checkout
@@ -40,7 +41,7 @@ jobs:
       - name: Create latest release
         run: |
           gh release create latest \
-            --title "CRE8 Members Language Packs (latest)" \
+            --title "CRE8 Plans Language Packs (latest)" \
             --notes "Automatically built from the latest translations on \`main\`.
 
           **Install:** Download the ZIP for your language and install via *Joomla → System → Install → Extensions*." \
@@ -48,55 +49,87 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate downloads-members.xml
+      - name: Generate downloads-plans.xml
         run: |
           python3 << 'PYEOF'
-          import re, subprocess
+          import re, subprocess, urllib.request, json, os
           from pathlib import Path
           from datetime import datetime, timezone
 
+          WEBLATE_TO_JOOMLA = {
+              'af': 'af-ZA', 'sq': 'sq-AL', 'am': 'am-ET', 'ar_SA': 'ar-SA',
+              'hy': 'hy-AM', 'az': 'az-AZ', 'eu': 'eu-ES', 'be': 'be-BY',
+              'bn': 'bn-BD', 'bs': 'bs-BA', 'bg': 'bg-BG', 'ca': 'ca-ES',
+              'zh_Hant_HK': 'zh-HK', 'zh_Hans': 'zh-CN', 'zh_Hant': 'zh-TW',
+              'hr': 'hr-HR', 'cs': 'cs-CZ', 'da': 'da-DK',
+              'nl': 'nl-NL', 'nl_BE': 'nl-BE', 'et': 'et-EE', 'fi': 'fi-FI',
+              'fr': 'fr-FR', 'fr_BE': 'fr-BE', 'fr_CA': 'fr-CA', 'fr_CH': 'fr-CH',
+              'gl': 'gl-ES', 'ka': 'ka-GE', 'de': 'de-DE', 'de_AT': 'de-AT',
+              'de_CH': 'de-CH', 'el': 'el-GR', 'gu': 'gu-IN', 'he_IL': 'he-IL',
+              'hi': 'hi-IN', 'hu': 'hu-HU', 'is': 'is-IS', 'id': 'id-ID',
+              'it': 'it-IT', 'ja': 'ja-JP', 'kk': 'kk-KZ', 'km': 'km-KH',
+              'ko': 'ko-KR', 'lv': 'lv-LV', 'lt': 'lt-LT', 'mk': 'mk-MK',
+              'ms': 'ms-MY', 'mr': 'mr-IN', 'mn': 'mn-MN', 'nb_NO': 'nb-NO',
+              'fa': 'fa-IR', 'pl': 'pl-PL', 'pt_PT': 'pt-PT', 'pt_BR': 'pt-BR',
+              'ro': 'ro-RO', 'ru': 'ru-RU', 'sr': 'sr-RS', 'sk': 'sk-SK',
+              'sl': 'sl-SI', 'es': 'es-ES', 'es_AR': 'es-AR', 'es_BO': 'es-BO',
+              'es_CL': 'es-CL', 'es_CO': 'es-CO', 'es_CR': 'es-CR',
+              'es_EC': 'es-EC', 'es_SV': 'es-SV', 'es_MX': 'es-MX',
+              'es_NI': 'es-NI', 'es_PE': 'es-PE', 'es_US': 'es-US',
+              'es_VE': 'es-VE', 'sw': 'sw-KE', 'sv': 'sv-SE', 'ta': 'ta-IN',
+              'te': 'te-IN', 'th': 'th-TH', 'tr': 'tr-TR', 'uk': 'uk-UA',
+              'ur': 'ur-PK', 'vi': 'vi-VN',
+          }
+
+          progress_map = {}
+          weblate_token = os.environ.get('WEBLATE_TOKEN', '').strip()
+          if weblate_token:
+              url = 'https://translate.creative-graphics.ch/api/projects/payplans/languages/?format=json'
+              req = urllib.request.Request(url, headers={'Authorization': f'Token {weblate_token}'})
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      for lang in json.loads(r.read()):
+                          joomla = WEBLATE_TO_JOOMLA.get(lang['code'])
+                          if joomla:
+                              progress_map[joomla] = round(lang['translated_percent'])
+                  print(f'Weblate stats fetched: {len(progress_map)} locales')
+              except Exception as e:
+                  print(f'Warning: could not fetch Weblate stats: {e}')
+          else:
+              print('Warning: WEBLATE_TOKEN not set — progress will be 0 for all locales')
+
           lang_names = {
-              "af-ZA": "Afrikaans",               "am-ET": "Amharic",
-              "ar-SA": "Arabic",                  "az-AZ": "Azerbaijani",
-              "be-BY": "Belarusian",              "bg-BG": "Bulgarian",
-              "bn-BD": "Bengali",                 "bs-BA": "Bosnian",
-              "ca-ES": "Catalan",                 "cs-CZ": "Czech",
-              "da-DK": "Danish",                  "de-AT": "German (Austria)",
-              "de-CH": "German (Switzerland)",    "de-DE": "German",
-              "el-GR": "Greek",                   "es-AR": "Spanish (Argentina)",
-              "es-BO": "Spanish (Bolivia)",       "es-CL": "Spanish (Chile)",
-              "es-CO": "Spanish (Colombia)",      "es-CR": "Spanish (Costa Rica)",
-              "es-EC": "Spanish (Ecuador)",       "es-ES": "Spanish",
-              "es-MX": "Spanish (Mexico)",        "es-NI": "Spanish (Nicaragua)",
-              "es-PE": "Spanish (Peru)",          "es-SV": "Spanish (El Salvador)",
-              "es-US": "Spanish (US)",            "es-VE": "Spanish (Venezuela)",
-              "et-EE": "Estonian",                "eu-ES": "Basque",
-              "fa-IR": "Persian",                 "fi-FI": "Finnish",
-              "fr-BE": "French (Belgium)",        "fr-CA": "French (Canada)",
-              "fr-CH": "French (Switzerland)",    "fr-FR": "French",
-              "gl-ES": "Galician",                "gu-IN": "Gujarati",
-              "he-IL": "Hebrew",                  "hi-IN": "Hindi",
-              "hr-HR": "Croatian",                "hu-HU": "Hungarian",
-              "hy-AM": "Armenian",                "id-ID": "Indonesian",
-              "is-IS": "Icelandic",               "it-IT": "Italian",
-              "ja-JP": "Japanese",                "ka-GE": "Georgian",
-              "kk-KZ": "Kazakh",                  "km-KH": "Khmer",
-              "ko-KR": "Korean",                  "lt-LT": "Lithuanian",
-              "lv-LV": "Latvian",                 "mk-MK": "Macedonian",
-              "mn-MN": "Mongolian",               "mr-IN": "Marathi",
-              "ms-MY": "Malay",                   "nb-NO": "Norwegian",
-              "nl-BE": "Dutch (Belgium)",         "nl-NL": "Dutch",
-              "pl-PL": "Polish",                  "pt-BR": "Portuguese (Brazil)",
-              "pt-PT": "Portuguese",              "ro-RO": "Romanian",
-              "ru-RU": "Russian",                 "sk-SK": "Slovak",
-              "sl-SI": "Slovenian",               "sq-AL": "Albanian",
-              "sr-RS": "Serbian",                 "sv-SE": "Swedish",
-              "sw-KE": "Swahili",                 "ta-IN": "Tamil",
-              "te-IN": "Telugu",                  "th-TH": "Thai",
-              "tr-TR": "Turkish",                 "uk-UA": "Ukrainian",
-              "ur-PK": "Urdu",                    "vi-VN": "Vietnamese",
-              "zh-CN": "Chinese (Simplified)",    "zh-HK": "Chinese (Hong Kong)",
-              "zh-TW": "Chinese (Traditional)",
+              "af-ZA": "Afrikaans", "sq-AL": "Albanian", "am-ET": "Amharic",
+              "ar-SA": "Arabic", "hy-AM": "Armenian", "az-AZ": "Azerbaijani",
+              "eu-ES": "Basque", "be-BY": "Belarusian", "bn-BD": "Bengali",
+              "bs-BA": "Bosnian", "bg-BG": "Bulgarian", "ca-ES": "Catalan",
+              "zh-HK": "Chinese (Hong Kong)", "zh-CN": "Chinese (Simplified)",
+              "zh-TW": "Chinese (Traditional)", "hr-HR": "Croatian",
+              "cs-CZ": "Czech", "da-DK": "Danish", "nl-NL": "Dutch",
+              "nl-BE": "Dutch (Belgium)", "et-EE": "Estonian", "fi-FI": "Finnish",
+              "fr-FR": "French", "fr-BE": "French (Belgium)",
+              "fr-CA": "French (Canada)", "fr-CH": "French (Switzerland)",
+              "gl-ES": "Galician", "ka-GE": "Georgian", "de-DE": "German",
+              "de-AT": "German (Austria)", "de-CH": "German (Switzerland)",
+              "el-GR": "Greek", "gu-IN": "Gujarati", "he-IL": "Hebrew",
+              "hi-IN": "Hindi", "hu-HU": "Hungarian", "is-IS": "Icelandic",
+              "id-ID": "Indonesian", "it-IT": "Italian", "ja-JP": "Japanese",
+              "kk-KZ": "Kazakh", "km-KH": "Khmer", "ko-KR": "Korean",
+              "lv-LV": "Latvian", "lt-LT": "Lithuanian", "mk-MK": "Macedonian",
+              "ms-MY": "Malay", "mr-IN": "Marathi", "mn-MN": "Mongolian",
+              "nb-NO": "Norwegian", "fa-IR": "Persian", "pl-PL": "Polish",
+              "pt-PT": "Portuguese", "pt-BR": "Portuguese (Brazil)",
+              "ro-RO": "Romanian", "ru-RU": "Russian", "sr-RS": "Serbian",
+              "sk-SK": "Slovak", "sl-SI": "Slovenian", "es-ES": "Spanish",
+              "es-AR": "Spanish (Argentina)", "es-BO": "Spanish (Bolivia)",
+              "es-CL": "Spanish (Chile)", "es-CO": "Spanish (Colombia)",
+              "es-CR": "Spanish (Costa Rica)", "es-EC": "Spanish (Ecuador)",
+              "es-SV": "Spanish (El Salvador)", "es-MX": "Spanish (Mexico)",
+              "es-NI": "Spanish (Nicaragua)", "es-PE": "Spanish (Peru)",
+              "es-US": "Spanish (US)", "es-VE": "Spanish (Venezuela)",
+              "sw-KE": "Swahili", "sv-SE": "Swedish", "ta-IN": "Tamil",
+              "te-IN": "Telugu", "th-TH": "Thai", "tr-TR": "Turkish",
+              "uk-UA": "Ukrainian", "ur-PK": "Urdu", "vi-VN": "Vietnamese",
           }
 
           base_url = "https://github.com/translation-creative-graphics/payplans/releases/download/latest"
@@ -110,6 +143,7 @@ jobs:
               name = lang_names.get(code, code)
               size = zip_file.stat().st_size
               download = f"{base_url}/{zip_file.name}"
+              progress = progress_map.get(code, 0)
 
               result = subprocess.run(
                   ["git", "log", "-1", "--format=%cI", "--",
@@ -122,7 +156,8 @@ jobs:
               else:
                   updated = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
-              items.append({"code": code, "name": name, "download": download, "size": size, "updated": updated})
+              items.append({"code": code, "name": name, "download": download,
+                            "size": size, "updated": updated, "progress": progress})
 
           items.sort(key=lambda x: x["name"].lower())
 
@@ -135,19 +170,20 @@ jobs:
                   f"    <download>{item['download']}</download>",
                   f"    <size>{item['size']}</size>",
                   f"    <updated>{item['updated']}</updated>",
+                  f"    <progress>{item['progress']}</progress>",
                   "  </language>",
               ]
           lines.append("</languages>")
-
-          Path("downloads-members.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
-          print(f"Generated downloads-members.xml with {len(items)} languages")
+          count = lines.count("  <language>")
+          Path("downloads-plans.xml").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          print(f"Generated downloads-plans.xml with {count} languages")
           PYEOF
 
-      - name: Commit downloads-members.xml
+      - name: Commit downloads-plans.xml
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add downloads-members.xml
-          git diff --staged --quiet || git commit -m "chore: update downloads-members.xml [skip ci]"
+          git add downloads-plans.xml
+          git diff --staged --quiet || git commit -m "chore: update downloads-plans.xml [skip ci]"
           git pull --rebase
           git push

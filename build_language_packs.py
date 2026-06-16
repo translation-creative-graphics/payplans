@@ -1,121 +1,205 @@
 #!/usr/bin/env python3
-"""Build CRE8 Members (PayPlans) language pack ZIPs — one per locale, with Joomla XML manifest."""
+"""
+CRE8 Plans (PayPlans) language pack builder.
 
-import re
+For every non-en-GB locale present in the repo, builds one installable ZIP:
+  dist/com_payplans_{locale}.zip
+
+Each ZIP contains:
+  payplans_{locale}.xml            — Joomla file-extension manifest (root)
+  administrator/language/{locale}/ — admin .ini files (if any)
+  language/{locale}/               — site .ini files (if any)
+"""
+
 import zipfile
 from datetime import date
 from pathlib import Path
+from xml.etree.ElementTree import (
+    Element, SubElement, ElementTree, indent
+)
 
-DIST = Path('dist')
-DIST.mkdir(exist_ok=True)
+REPO       = Path(__file__).parent
+DIST       = REPO / "dist"
+VERSION    = "6.1.0"
+AUTHOR     = "Erik Winnelinckx, Pascal Kemper"
+EMAIL      = "info@creative-graphics.ch"
+URL        = "https://creative-graphics.ch/en"
+COPYRIGHT  = f"Copyright {date.today().year} Creative Graphics. All rights reserved"
+LICENSE    = "GPL License"
 
-LANG_NAMES = {
-    "af-ZA": "Afrikaans",               "am-ET": "Amharic",
-    "ar-SA": "Arabic",                  "az-AZ": "Azerbaijani",
-    "be-BY": "Belarusian",              "bg-BG": "Bulgarian",
-    "bn-BD": "Bengali",                 "bs-BA": "Bosnian",
-    "ca-ES": "Catalan",                 "cs-CZ": "Czech",
-    "da-DK": "Danish",                  "de-AT": "German (Austria)",
-    "de-CH": "German (Switzerland)",    "de-DE": "German",
-    "el-GR": "Greek",                   "es-AR": "Spanish (Argentina)",
-    "es-BO": "Spanish (Bolivia)",       "es-CL": "Spanish (Chile)",
-    "es-CO": "Spanish (Colombia)",      "es-CR": "Spanish (Costa Rica)",
-    "es-EC": "Spanish (Ecuador)",       "es-ES": "Spanish",
-    "es-MX": "Spanish (Mexico)",        "es-NI": "Spanish (Nicaragua)",
-    "es-PE": "Spanish (Peru)",          "es-SV": "Spanish (El Salvador)",
-    "es-US": "Spanish (US)",            "es-VE": "Spanish (Venezuela)",
-    "et-EE": "Estonian",                "eu-ES": "Basque",
-    "fa-IR": "Persian",                 "fi-FI": "Finnish",
-    "fr-BE": "French (Belgium)",        "fr-CA": "French (Canada)",
-    "fr-CH": "French (Switzerland)",    "fr-FR": "French",
-    "gl-ES": "Galician",                "gu-IN": "Gujarati",
-    "he-IL": "Hebrew",                  "hi-IN": "Hindi",
-    "hr-HR": "Croatian",                "hu-HU": "Hungarian",
-    "hy-AM": "Armenian",                "id-ID": "Indonesian",
-    "is-IS": "Icelandic",               "it-IT": "Italian",
-    "ja-JP": "Japanese",                "ka-GE": "Georgian",
-    "kk-KZ": "Kazakh",                  "km-KH": "Khmer",
-    "ko-KR": "Korean",                  "lt-LT": "Lithuanian",
-    "lv-LV": "Latvian",                 "mk-MK": "Macedonian",
-    "mn-MN": "Mongolian",               "mr-IN": "Marathi",
-    "ms-MY": "Malay",                   "nb-NO": "Norwegian",
-    "nl-BE": "Dutch (Belgium)",         "nl-NL": "Dutch",
-    "pl-PL": "Polish",                  "pt-BR": "Portuguese (Brazil)",
-    "pt-PT": "Portuguese",              "ro-RO": "Romanian",
-    "ru-RU": "Russian",                 "sk-SK": "Slovak",
-    "sl-SI": "Slovenian",               "sq-AL": "Albanian",
-    "sr-RS": "Serbian",                 "sv-SE": "Swedish",
-    "sw-KE": "Swahili",                 "ta-IN": "Tamil",
-    "te-IN": "Telugu",                  "th-TH": "Thai",
-    "tr-TR": "Turkish",                 "uk-UA": "Ukrainian",
-    "ur-PK": "Urdu",                    "vi-VN": "Vietnamese",
-    "zh-CN": "Chinese (Simplified)",    "zh-HK": "Chinese (Hong Kong)",
+LOCALE_NAMES = {
+    "af-ZA": "Afrikaans",
+    "sq-AL": "Albanian",
+    "am-ET": "Amharic",
+    "ar-SA": "Arabic",
+    "hy-AM": "Armenian",
+    "az-AZ": "Azerbaijani",
+    "eu-ES": "Basque",
+    "be-BY": "Belarusian",
+    "bn-BD": "Bengali",
+    "bs-BA": "Bosnian",
+    "bg-BG": "Bulgarian",
+    "ca-ES": "Catalan",
+    "zh-HK": "Chinese (Hong Kong)",
+    "zh-CN": "Chinese (Simplified)",
     "zh-TW": "Chinese (Traditional)",
+    "hr-HR": "Croatian",
+    "cs-CZ": "Czech",
+    "da-DK": "Danish",
+    "nl-NL": "Dutch",
+    "nl-BE": "Dutch (Belgium)",
+    "et-EE": "Estonian",
+    "fi-FI": "Finnish",
+    "fr-FR": "French",
+    "fr-BE": "French (Belgium)",
+    "fr-CA": "French (Canada)",
+    "fr-CH": "French (Switzerland)",
+    "gl-ES": "Galician",
+    "ka-GE": "Georgian",
+    "de-DE": "German",
+    "de-AT": "German (Austria)",
+    "de-CH": "German (Switzerland)",
+    "el-GR": "Greek",
+    "gu-IN": "Gujarati",
+    "he-IL": "Hebrew",
+    "hi-IN": "Hindi",
+    "hu-HU": "Hungarian",
+    "is-IS": "Icelandic",
+    "id-ID": "Indonesian",
+    "it-IT": "Italian",
+    "ja-JP": "Japanese",
+    "kk-KZ": "Kazakh",
+    "km-KH": "Khmer",
+    "ko-KR": "Korean",
+    "lv-LV": "Latvian",
+    "lt-LT": "Lithuanian",
+    "mk-MK": "Macedonian",
+    "ms-MY": "Malay",
+    "mr-IN": "Marathi",
+    "mn-MN": "Mongolian",
+    "nb-NO": "Norwegian",
+    "fa-IR": "Persian",
+    "pl-PL": "Polish",
+    "pt-PT": "Portuguese",
+    "pt-BR": "Portuguese (Brazil)",
+    "ro-RO": "Romanian",
+    "ru-RU": "Russian",
+    "sr-RS": "Serbian",
+    "sk-SK": "Slovak",
+    "sl-SI": "Slovenian",
+    "es-ES": "Spanish",
+    "es-AR": "Spanish (Argentina)",
+    "es-BO": "Spanish (Bolivia)",
+    "es-CL": "Spanish (Chile)",
+    "es-CO": "Spanish (Colombia)",
+    "es-CR": "Spanish (Costa Rica)",
+    "es-EC": "Spanish (Ecuador)",
+    "es-SV": "Spanish (El Salvador)",
+    "es-MX": "Spanish (Mexico)",
+    "es-NI": "Spanish (Nicaragua)",
+    "es-PE": "Spanish (Peru)",
+    "es-US": "Spanish (US)",
+    "es-VE": "Spanish (Venezuela)",
+    "sw-KE": "Swahili",
+    "sv-SE": "Swedish",
+    "ta-IN": "Tamil",
+    "te-IN": "Telugu",
+    "th-TH": "Thai",
+    "tr-TR": "Turkish",
+    "uk-UA": "Ukrainian",
+    "ur-PK": "Urdu",
+    "vi-VN": "Vietnamese",
 }
 
-VERSION      = "6.0"
-CREATED      = date.today().strftime("%-d %B %Y")
-AUTHOR       = "CRE8"
-AUTHOR_URL   = "https://cre8.social"
-AUTHOR_EMAIL = "support@birdgraphics.ch"
+SECTIONS = [
+    "administrator/language",
+    "language",
+]
 
 
-def make_manifest(locale: str, name: str, admin_files: list, site_files: list) -> str:
-    def file_tags(files):
-        return "\n".join(f"            <filename>{f}</filename>" for f in files)
+def make_manifest(locale: str, sections_files: dict[str, list[str]]) -> bytes:
+    lang_name = LOCALE_NAMES.get(locale, locale)
+    root = Element("extension", type="file", version="3.0.0", method="upgrade")
+    SubElement(root, "name").text        = f"CRE8 Plans - Language Pack {lang_name} ({locale})"
+    SubElement(root, "version").text     = VERSION
+    SubElement(root, "creationDate").text = date.today().strftime("%-d %B %Y")
+    SubElement(root, "author").text      = AUTHOR
+    SubElement(root, "authorEmail").text = EMAIL
+    SubElement(root, "authorUrl").text   = URL
+    SubElement(root, "copyright").text   = COPYRIGHT
+    SubElement(root, "license").text     = LICENSE
+    SubElement(root, "description").text = f"{lang_name} Language Pack for CRE8 Plans {VERSION}"
 
-    return f"""<?xml version="1.0" encoding="utf-8"?>
-<extension type="file" version="3.0.0" method="upgrade">
-\t<name>CRE8 Members - Language Pack {name} ({locale})</name>
-\t<version>{VERSION}</version>
-\t<creationDate>{CREATED}</creationDate>
-\t<author>{AUTHOR}</author>
-\t<authorEmail>{AUTHOR_EMAIL}</authorEmail>
-\t<authorUrl>{AUTHOR_URL}</authorUrl>
-\t<copyright>Copyright {date.today().year} {AUTHOR}. All rights reserved.</copyright>
-\t<license>GPL License</license>
-\t<description>{name} Language Pack for CRE8 Members {VERSION}</description>
-\t<fileset>
-\t\t<files folder="administrator/language/{locale}" target="administrator/language/{locale}">
-{file_tags(admin_files)}
-\t\t</files>
-\t\t<files folder="language/{locale}" target="language/{locale}">
-{file_tags(site_files)}
-\t\t</files>
-\t</fileset>
-</extension>
-"""
+    fileset = SubElement(root, "fileset")
+    for section, filenames in sections_files.items():
+        if not filenames:
+            continue
+        folder = f"{section}/{locale}"
+        files_el = SubElement(fileset, "files", folder=folder, target=folder)
+        for fname in sorted(filenames):
+            SubElement(files_el, "filename").text = fname
+
+    indent(root, space="    ")
+    tree = ElementTree(root)
+
+    import io
+    buf = io.StringIO()
+    buf.write('<?xml version="1.0" encoding="utf-8"?>\n')
+    tree.write(buf, encoding="unicode", xml_declaration=False)
+    return buf.getvalue().encode("utf-8")
 
 
-locales = sorted([
-    d.name for d in Path('language').iterdir()
-    if d.is_dir()
-    and d.name != 'en-GB'
-    and re.match(r'^[a-z]{2}-[A-Z]{2}$', d.name)
-])
+def build_locale(locale: str) -> bool:
+    sections_files: dict[str, list[str]] = {}
+    any_files = False
 
-for locale in locales:
-    name = LANG_NAMES.get(locale, locale)
+    for section in SECTIONS:
+        locale_dir = REPO / section / locale
+        if locale_dir.is_dir():
+            filenames = [f.name for f in sorted(locale_dir.glob("*.ini"))]
+        else:
+            filenames = []
+        sections_files[section] = filenames
+        if filenames:
+            any_files = True
 
-    site_dir  = Path('language') / locale
-    admin_dir = Path('administrator') / 'language' / locale
+    if not any_files:
+        print(f"  SKIP {locale}  (no .ini files found)")
+        return False
 
-    site_files  = sorted(f.name for f in site_dir.iterdir())  if site_dir.exists()  else []
-    admin_files = sorted(f.name for f in admin_dir.iterdir()) if admin_dir.exists() else []
+    manifest_bytes = make_manifest(locale, sections_files)
+    manifest_name  = f"payplans_{locale}.xml"
+    zip_path       = DIST / f"com_payplans_{locale}.zip"
 
-    manifest = make_manifest(locale, name, admin_files, site_files)
-    manifest_name = f'payplans_{locale}.xml'
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(manifest_name, manifest_bytes)
+        for section, filenames in sections_files.items():
+            for fname in filenames:
+                src = REPO / section / locale / fname
+                zf.write(src, arcname=f"{section}/{locale}/{fname}")
 
-    zip_path = DIST / f'com_payplans_{locale}.zip'
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr(manifest_name, manifest)
+    total = sum(len(v) for v in sections_files.values())
+    print(f"  {locale:8s}  {total:3d} files  →  {zip_path.name}")
+    return True
 
-        for f in sorted(site_dir.iterdir()) if site_dir.exists() else []:
-            zf.write(f, f'language/{locale}/{f.name}')
 
-        for f in sorted(admin_dir.iterdir()) if admin_dir.exists() else []:
-            zf.write(f, f'administrator/language/{locale}/{f.name}')
+def main():
+    DIST.mkdir(exist_ok=True)
 
-    print(f'Built {zip_path.name}  ({zip_path.stat().st_size:,} bytes)')
+    locales = sorted(
+        d.name
+        for d in (REPO / "language").iterdir()
+        if d.is_dir() and d.name != "en-GB"
+    )
 
-print(f'\nTotal: {len(locales)} language packs')
+    print(f"Building {len(locales)} language packs into {DIST}/\n")
+    built = 0
+    for locale in locales:
+        if build_locale(locale):
+            built += 1
+
+    print(f"\nDone — {built} ZIPs written to {DIST}/")
+
+
+if __name__ == "__main__":
+    main()
