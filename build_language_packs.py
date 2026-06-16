@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CRE8 Plans (PayPlans) language pack builder.
+CRE8 Members (PayPlans) language pack builder.
 
 For every non-en-GB locale present in the repo, builds one installable ZIP:
   dist/com_payplans_{locale}.zip
@@ -120,7 +120,7 @@ SECTIONS = [
 def make_manifest(locale: str, sections_files: dict[str, list[str]]) -> bytes:
     lang_name = LOCALE_NAMES.get(locale, locale)
     root = Element("extension", type="file", version="3.0.0", method="upgrade")
-    SubElement(root, "name").text        = f"CRE8 Plans - Language Pack {lang_name} ({locale})"
+    SubElement(root, "name").text        = f"CRE8 Members - Language Pack {lang_name} ({locale})"
     SubElement(root, "version").text     = VERSION
     SubElement(root, "creationDate").text = date.today().strftime("%-d %B %Y")
     SubElement(root, "author").text      = AUTHOR
@@ -128,7 +128,7 @@ def make_manifest(locale: str, sections_files: dict[str, list[str]]) -> bytes:
     SubElement(root, "authorUrl").text   = URL
     SubElement(root, "copyright").text   = COPYRIGHT
     SubElement(root, "license").text     = LICENSE
-    SubElement(root, "description").text = f"{lang_name} Language Pack for CRE8 Plans {VERSION}"
+    SubElement(root, "description").text = f"{lang_name} Language Pack for CRE8 Members {VERSION}"
 
     fileset = SubElement(root, "fileset")
     for section, filenames in sections_files.items():
