@@ -4,7 +4,7 @@
     <code>af-ZA</code>
     <name>Afrikaans</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_af-ZA.zip</download>
-    <size>91659</size>
+    <size>91658</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>7</progress>
   </language>
@@ -12,7 +12,7 @@
     <code>sq-AL</code>
     <name>Albanian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_sq-AL.zip</download>
-    <size>91284</size>
+    <size>91285</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>3</progress>
   </language>
@@ -20,7 +20,7 @@
     <code>am-ET</code>
     <name>Amharic</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_am-ET.zip</download>
-    <size>90444</size>
+    <size>90443</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -28,7 +28,7 @@
     <code>ar-SA</code>
     <name>Arabic</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_ar-SA.zip</download>
-    <size>98968</size>
+    <size>98967</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>9</progress>
   </language>
@@ -36,7 +36,7 @@
     <code>hy-AM</code>
     <name>Armenian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_hy-AM.zip</download>
-    <size>91525</size>
+    <size>91526</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>2</progress>
   </language>
@@ -52,7 +52,7 @@
     <code>eu-ES</code>
     <name>Basque</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_eu-ES.zip</download>
-    <size>90432</size>
+    <size>90431</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -60,7 +60,7 @@
     <code>be-BY</code>
     <name>Belarusian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_be-BY.zip</download>
-    <size>92295</size>
+    <size>92294</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>3</progress>
   </language>
@@ -76,7 +76,7 @@
     <code>bs-BA</code>
     <name>Bosnian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_bs-BA.zip</download>
-    <size>95373</size>
+    <size>95372</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>17</progress>
   </language>
@@ -92,7 +92,7 @@
     <code>ca-ES</code>
     <name>Catalan</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_ca-ES.zip</download>
-    <size>92654</size>
+    <size>92655</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>10</progress>
   </language>
@@ -124,7 +124,7 @@
     <code>hr-HR</code>
     <name>Croatian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_hr-HR.zip</download>
-    <size>92639</size>
+    <size>92640</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>8</progress>
   </language>
@@ -148,8 +148,8 @@
     <code>nl-NL</code>
     <name>Dutch</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_nl-NL.zip</download>
-    <size>185176</size>
-    <updated>2026-08-10 14:19:39</updated>
+    <size>185230</size>
+    <updated>2026-08-11 15:19:41</updated>
     <progress>74</progress>
   </language>
   <language>
@@ -204,7 +204,7 @@
     <code>fr-CH</code>
     <name>French (Switzerland)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_fr-CH.zip</download>
-    <size>90429</size>
+    <size>90428</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -228,7 +228,7 @@
     <code>de-DE</code>
     <name>German</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_de-DE.zip</download>
-    <size>99438</size>
+    <size>99439</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>35</progress>
   </language>
@@ -236,7 +236,7 @@
     <code>de-AT</code>
     <name>German (Austria)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_de-AT.zip</download>
-    <size>90424</size>
+    <size>90423</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -244,7 +244,7 @@
     <code>de-CH</code>
     <name>German (Switzerland)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_de-CH.zip</download>
-    <size>90954</size>
+    <size>90955</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>2</progress>
   </language>
@@ -252,7 +252,7 @@
     <code>el-GR</code>
     <name>Greek</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_el-GR.zip</download>
-    <size>102609</size>
+    <size>102610</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>16</progress>
   </language>
@@ -268,7 +268,7 @@
     <code>he-IL</code>
     <name>Hebrew</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_he-IL.zip</download>
-    <size>93085</size>
+    <size>93084</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>8</progress>
   </language>
@@ -292,7 +292,7 @@
     <code>is-IS</code>
     <name>Icelandic</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_is-IS.zip</download>
-    <size>91685</size>
+    <size>91684</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>4</progress>
   </language>
@@ -316,7 +316,7 @@
     <code>ja-JP</code>
     <name>Japanese</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_ja-JP.zip</download>
-    <size>100541</size>
+    <size>100542</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>20</progress>
   </language>
@@ -348,7 +348,7 @@
     <code>lv-LV</code>
     <name>Latvian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_lv-LV.zip</download>
-    <size>92363</size>
+    <size>92364</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>7</progress>
   </language>
@@ -364,7 +364,7 @@
     <code>mk-MK</code>
     <name>Macedonian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_mk-MK.zip</download>
-    <size>92027</size>
+    <size>92028</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>2</progress>
   </language>
@@ -380,7 +380,7 @@
     <code>mr-IN</code>
     <name>Marathi</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_mr-IN.zip</download>
-    <size>91351</size>
+    <size>91349</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>1</progress>
   </language>
@@ -412,7 +412,7 @@
     <code>pl-PL</code>
     <name>Polish</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_pl-PL.zip</download>
-    <size>98240</size>
+    <size>98241</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>44</progress>
   </language>
@@ -428,7 +428,7 @@
     <code>pt-BR</code>
     <name>Portuguese (Brazil)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_pt-BR.zip</download>
-    <size>97986</size>
+    <size>97985</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>42</progress>
   </language>
@@ -436,7 +436,7 @@
     <code>ro-RO</code>
     <name>Romanian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_ro-RO.zip</download>
-    <size>92501</size>
+    <size>92503</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>9</progress>
   </language>
@@ -444,7 +444,7 @@
     <code>ru-RU</code>
     <name>Russian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_ru-RU.zip</download>
-    <size>114160</size>
+    <size>114161</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>41</progress>
   </language>
@@ -452,7 +452,7 @@
     <code>sr-RS</code>
     <name>Serbian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_sr-RS.zip</download>
-    <size>94083</size>
+    <size>94082</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>8</progress>
   </language>
@@ -460,7 +460,7 @@
     <code>sk-SK</code>
     <name>Slovak</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_sk-SK.zip</download>
-    <size>93227</size>
+    <size>93228</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>9</progress>
   </language>
@@ -468,7 +468,7 @@
     <code>sl-SI</code>
     <name>Slovenian</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_sl-SI.zip</download>
-    <size>92358</size>
+    <size>92357</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>8</progress>
   </language>
@@ -492,7 +492,7 @@
     <code>es-BO</code>
     <name>Spanish (Bolivia)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-BO.zip</download>
-    <size>91018</size>
+    <size>91019</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>2</progress>
   </language>
@@ -508,7 +508,7 @@
     <code>es-CO</code>
     <name>Spanish (Colombia)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-CO.zip</download>
-    <size>90934</size>
+    <size>90935</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>2</progress>
   </language>
@@ -516,7 +516,7 @@
     <code>es-CR</code>
     <name>Spanish (Costa Rica)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-CR.zip</download>
-    <size>90425</size>
+    <size>90426</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -532,7 +532,7 @@
     <code>es-SV</code>
     <name>Spanish (El Salvador)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-SV.zip</download>
-    <size>90428</size>
+    <size>90427</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -548,7 +548,7 @@
     <code>es-NI</code>
     <name>Spanish (Nicaragua)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-NI.zip</download>
-    <size>90426</size>
+    <size>90425</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -556,7 +556,7 @@
     <code>es-PE</code>
     <name>Spanish (Peru)</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_es-PE.zip</download>
-    <size>90495</size>
+    <size>90496</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>0</progress>
   </language>
@@ -588,7 +588,7 @@
     <code>sv-SE</code>
     <name>Swedish</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_sv-SE.zip</download>
-    <size>143575</size>
+    <size>143574</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>68</progress>
   </language>
@@ -612,7 +612,7 @@
     <code>th-TH</code>
     <name>Thai</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_th-TH.zip</download>
-    <size>110204</size>
+    <size>110203</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>28</progress>
   </language>
@@ -644,7 +644,7 @@
     <code>vi-VN</code>
     <name>Vietnamese</name>
     <download>https://github.com/translation-creative-graphics/payplans/releases/download/latest/com_payplans_vi-VN.zip</download>
-    <size>94088</size>
+    <size>94087</size>
     <updated>2026-06-26 12:06:45</updated>
     <progress>9</progress>
   </language>
